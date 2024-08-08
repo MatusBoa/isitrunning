@@ -1,0 +1,45 @@
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/IBM/sarama"
+)
+
+const (
+	KafkaServerAddress = "localhost:9092"
+	KafkaTopic         = "notifications"
+)
+
+func setupProducer() (sarama.SyncProducer, error) {
+	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
+	producer, err := sarama.NewSyncProducer([]string{KafkaServerAddress},
+		config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to setup producer: %w", err)
+	}
+	return producer, nil
+}
+
+func sendKafkaMessage(producer sarama.SyncProducer, message string) error {
+	msg := &sarama.ProducerMessage{
+		Topic: KafkaTopic,
+		Value: sarama.StringEncoder(message),
+	}
+
+	_, _, err := producer.SendMessage(msg)
+
+	return err
+}
+
+func main() {
+	producer, err := setupProducer()
+	if err != nil {
+		log.Fatalf("failed to initialize producer: %v", err)
+	}
+	defer producer.Close()
+
+	sendKafkaMessage(producer, "Hello world")
+}

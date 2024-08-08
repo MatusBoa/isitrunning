@@ -1,0 +1,73 @@
+name: "isitrunning"
+
+x-logging: &default-logging
+  options:
+    max-size: "12m"
+    max-file: "5"
+  driver: json-file
+
+x-restart-policy: &restart-policy
+  restart: unless-stopped
+
+networks:
+  isitrunning:
+
+services:
+  zookeeper:
+    logging: *default-logging
+    <<: *restart-policy
+    image: docker.io/bitnami/zookeeper:3.9
+    ports:
+      - "2181:2181"
+    volumes:
+      - "./.data/zookeeper:/bitnami/zookeeper"
+    networks:
+      - isitrunning
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    logging: *default-logging
+    <<: *restart-policy
+    image: docker.io/bitnami/kafka:3.8
+    ports:
+      - "9092:9092"
+    volumes:
+      - "./.data/kafka:/bitnami/kafka"
+    networks:
+      - isitrunning
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    depends_on:
+      - zookeeper
+  soketi:
+    logging: *default-logging
+    <<: *restart-policy
+    image: quay.io/soketi/soketi:latest-16-distroless
+    ports:
+      - "6001:6001"
+      - "9601:9601"
+    environment:
+      - SOKETI_DEFAULT_APP_ENABLE_CLIENT_MESSAGES=true
+    networks:
+      - isitrunning
+  clickhouse:
+    logging: *default-logging
+    <<: *restart-policy
+    image: docker.io/bitnami/clickhouse:23.8
+    ports:
+      - "9000:9000"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - "./.data/clickhouse:/bitnami/clickhouse"
+    networks:
+      - isitrunning
