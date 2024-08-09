@@ -26,14 +26,6 @@ type KafkaEventDispatcher struct {
 	producer sarama.SyncProducer
 }
 
-type KafkaEvent struct {
-	Message string
-}
-
-func (e *KafkaEvent) ToString() string {
-	return e.Message
-}
-
 func (dispatcher KafkaEventDispatcher) Dispatch(topic string, event events.Event) error {
 	_, _, err := dispatcher.producer.SendMessage(&sarama.ProducerMessage{
 		Topic: topic,

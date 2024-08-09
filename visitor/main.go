@@ -12,7 +12,7 @@ func main() {
 	eventDispatcher := kafka.Create("localhost:9092")
 	c := cron.New(cron.WithSeconds())
 
-	c.AddJob("*/30 * * * * *", jobs.RequestPagesJob{
+	c.AddJob("*/10 * * * * *", jobs.HeartbeatJob{
 		EventDispatcher: eventDispatcher,
 	})
 

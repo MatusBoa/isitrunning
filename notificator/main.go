@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -10,14 +11,21 @@ import (
 )
 
 const (
-	ConsumerGroup      = "page-group2"
-	ConsumerTopic      = "page"
+	ConsumerGroup      = "page-group"
+	ConsumerTopic      = "heartbeat"
 	KafkaServerAddress = "localhost:9092"
 )
 
 var (
 	PusherClient pusher.Client
 )
+
+type HeartbeatEvent struct {
+	Hostname     string `json:"hostname"`
+	Url          string `json:"url"`
+	StatusCode   uint   `json:"status_code"`
+	ResponseTime uint64 `json:"response_time"`
+}
 
 type Consumer struct {
 }
@@ -29,7 +37,16 @@ func (consumer *Consumer) ConsumeClaim(
 	sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		log.Print(string(msg.Value))
-		PusherClient.Trigger("test", "stats", string(msg.Value))
+
+		event := HeartbeatEvent{}
+
+		err := json.Unmarshal(msg.Value, &event)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		PusherClient.Trigger(event.Hostname, "heartbeat", string(msg.Value))
 	}
 	return nil
 }
