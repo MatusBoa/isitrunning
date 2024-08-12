@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"isitrunning/visitor/events"
+	"isitrunning/backend/events"
 	"log"
 	"net/http"
 	"net/url"
@@ -13,6 +13,7 @@ type HeartbeatJob struct {
 }
 
 func (job HeartbeatJob) Run() {
+	// @todo: Get pages from database
 	pages := []string{
 		"https://simplo.cz",
 		"https://koterba.sk",
