@@ -29,7 +29,7 @@ func (c HearthbeatPassthroughConsumer) Config() consumer.ConsumerConfig {
 func (consumer *HearthbeatPassthroughConsumer) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	// @todo: Use env
 	ws := pusher.CreateWebsocketClient("app-id", "app-secret", "app-key", "127.0.0.1:6001")
-	
+
 	for msg := range claim.Messages() {
 		event := events.HeartbeatEvent{}
 
@@ -40,7 +40,7 @@ func (consumer *HearthbeatPassthroughConsumer) ConsumeClaim(sess sarama.Consumer
 			continue
 		}
 
-		ws.Emit(event.Hostname, "heartbeat", string(msg.Value))
+		ws.Emit(event.MonitorUuid, "heartbeat", string(msg.Value))
 		log.Println("passthrough")
 	}
 

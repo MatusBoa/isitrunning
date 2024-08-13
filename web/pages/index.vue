@@ -6,7 +6,7 @@
     </div>
 
     <div class="grid grid-cols-3 gap-6">
-      <SiteHeartbeat hostname="koterba.sk" />
+      <SiteHeartbeat hostname="deb0fdaa-786f-4526-bdc0-f732c273df2f" />
       <SiteHeartbeat hostname="simplo.cz" />
       <SiteHeartbeat hostname="gateway01.simplo.cz" />
     </div>

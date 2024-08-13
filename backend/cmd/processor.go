@@ -7,6 +7,7 @@ import (
 	"context"
 	"isitrunning/backend/consumer"
 	"isitrunning/backend/consumer/heartbeat"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -16,16 +17,10 @@ var processorCmd = &cobra.Command{
 	Use:   "processor",
 	Short: "Runs processor service, that processes heartbeats",
 	Run: func(cmd *cobra.Command, args []string) {
+		log.Println("Starting processor service...")
+
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-
-		go consumer.InitializeConsumer(ctx, &heartbeat.HearthbeatPassthroughConsumer{
-			ConsumerConfig: consumer.ConsumerConfig{
-				ServerAddress: []string{"localhost:9092"},
-				Topic:         []string{"heartbeat"},
-				Group:         "heartbeat_ws_passthrough",
-			},
-		})
 
 		go consumer.InitializeConsumer(ctx, &heartbeat.HeartBeatPersisterConsumer{
 			ConsumerConfig: consumer.ConsumerConfig{
@@ -34,6 +29,8 @@ var processorCmd = &cobra.Command{
 				Group:         "heartbeat_persister",
 			},
 		})
+
+		log.Println("Processor is running")
 
 		select {}
 	},

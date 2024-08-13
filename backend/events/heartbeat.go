@@ -3,8 +3,7 @@ package events
 import "encoding/json"
 
 type HeartbeatEvent struct {
-	Hostname     string `json:"hostname"`
-	Url          string `json:"url"`
+	MonitorUuid  string `json:"monitor_uuid"`
 	StatusCode   uint   `json:"status_code"`
 	ResponseTime uint64 `json:"response_time"`
 }

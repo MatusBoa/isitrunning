@@ -1,10 +1,11 @@
 package jobs
 
 import (
+	"isitrunning/backend/db"
 	"isitrunning/backend/events"
+	"isitrunning/backend/repositories"
 	"log"
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -13,19 +14,25 @@ type HeartbeatJob struct {
 }
 
 func (job HeartbeatJob) Run() {
-	// @todo: Get pages from database
-	pages := []string{
-		"https://simplo.cz",
-		"https://koterba.sk",
-		"https://gateway01.simplo.cz",
+	d, err := db.Initialize()
+
+	if err != nil {
+		panic(err)
 	}
 
-	for _, page := range pages {
+	mr := repositories.CreateMonitorRepository(&d)
+	monitors, err := mr.GetAll()
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, monitor := range monitors {
 		go func() {
-			log.Printf("Sending heartbeat to %s", page)
+			log.Printf("Sending heartbeat to %s", monitor.Uuid)
 
 			requestCreatedAt := time.Now()
-			response, err := http.Get(page)
+			response, err := http.Get(monitor.Url)
 
 			if err != nil {
 				log.Fatal("ERROR", err)
@@ -35,11 +42,8 @@ func (job HeartbeatJob) Run() {
 			defer response.Body.Close()
 			responseTime := time.Since(requestCreatedAt).Milliseconds()
 
-			parsed, _ := url.Parse(page)
-
 			job.EventDispatcher.Dispatch("heartbeat", events.HeartbeatEvent{
-				Hostname:     parsed.Hostname(),
-				Url:          page,
+				MonitorUuid:  monitor.Uuid,
 				StatusCode:   uint(response.StatusCode),
 				ResponseTime: uint64(responseTime),
 			})

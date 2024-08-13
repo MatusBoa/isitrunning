@@ -52,18 +52,6 @@ services:
       - SOKETI_DEFAULT_APP_ENABLE_CLIENT_MESSAGES=true
     networks:
       - isitrunning
-  clickhouse:
-    logging: *default-logging
-    <<: *restart-policy
-    image: docker.io/bitnami/clickhouse:23.8
-    ports:
-      - "9000:9000"
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - "./.data/clickhouse:/bitnami/clickhouse"
-    networks:
-      - isitrunning
   cassandra:
     logging: *default-logging
     <<: *restart-policy
@@ -87,5 +75,4 @@ services:
   #     - isitrunning
   #   depends_on:
   #     - kafka
-  #     - clickhouse
-    
+  #     - cassandra

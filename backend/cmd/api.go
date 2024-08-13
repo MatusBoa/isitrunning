@@ -16,6 +16,7 @@ var apiCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
 		d, err := db.Initialize()
+		defer d.Close()
 
 		if err != nil {
 			panic(err)
