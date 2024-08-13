@@ -7,7 +7,6 @@ import (
 )
 
 type MonitorHeartbeat struct {
-	Uuid         string    `json:"uuid"`
 	MonitorUuid  string    `json:"monitor_uuid"`
 	StatusCode   uint      `json:"status_code"`
 	ResponseTime uint64    `json:"response_time"`
@@ -17,6 +16,6 @@ type MonitorHeartbeat struct {
 func MonitorHeartbeatTableDefinition() table.Metadata {
 	return table.Metadata{
 		Name:    "monitor_heartbeats",
-		Columns: []string{"uuid", "monitor_uuid", "status_code", "response_time", "created_at"},
+		Columns: []string{"monitor_uuid", "status_code", "response_time", "created_at"},
 	}
 }

@@ -4,9 +4,10 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"isitrunning/backend/db"
-	"isitrunning/backend/repositories"
+	"isitrunning/backend/http/handlers"
 
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/spf13/cobra"
 )
 
@@ -15,16 +16,16 @@ var apiCmd = &cobra.Command{
 	Use:   "api",
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
-		d, err := db.Initialize()
-		defer d.Close()
+		e := echo.New()
 
-		if err != nil {
-			panic(err)
-		}
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"http://localhost:3000"},
+			AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		}))
 
-		mr := repositories.CreateMonitorRepository(&d)
+		e.GET("/monitors", handlers.IndexMonitors)
 
-		mr.GetAll()
+		e.Logger.Fatal(e.Start(":1323"))
 	},
 }
 

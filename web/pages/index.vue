@@ -6,13 +6,11 @@
     </div>
 
     <div class="grid grid-cols-3 gap-6">
-      <SiteHeartbeat hostname="deb0fdaa-786f-4526-bdc0-f732c273df2f" />
-      <SiteHeartbeat hostname="simplo.cz" />
-      <SiteHeartbeat hostname="gateway01.simplo.cz" />
+      <SiteHeartbeat v-for="monitor in data" :monitor="monitor.monitor" :heartbeats="monitor.monitor_heartbeats" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-
+const { data } = await useFetch('http://localhost:1323/monitors')
 </script>
