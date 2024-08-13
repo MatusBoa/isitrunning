@@ -15,7 +15,7 @@ import (
 // holterCmd represents the holter command
 var holterCmd = &cobra.Command{
 	Use:   "holter",
-	Short: "A brief description of your command",
+	Short: "Runs holter service, that periodically collects heartbeats from monitors",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Starting holter service...")
 

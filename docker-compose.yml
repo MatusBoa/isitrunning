@@ -64,6 +64,19 @@ services:
       - "./.data/clickhouse:/bitnami/clickhouse"
     networks:
       - isitrunning
+  cassandra:
+    logging: *default-logging
+    <<: *restart-policy
+    image: docker.io/bitnami/cassandra:4.0-debian-12
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEE
+    ports:
+      - "9042:9042"
+    volumes:
+      - "./.data/cassandra:/bitnami/cassandra"
+    networks:
+      - isitrunning
   # holter:
   #   logging: *default-logging
   #   <<: *restart-policy

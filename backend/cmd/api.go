@@ -1,11 +1,11 @@
 /*
 Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
-	"fmt"
+	"isitrunning/backend/db"
+	"isitrunning/backend/repositories"
 
 	"github.com/spf13/cobra"
 )
@@ -15,7 +15,15 @@ var apiCmd = &cobra.Command{
 	Use:   "api",
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("api called")
+		d, err := db.Initialize()
+
+		if err != nil {
+			panic(err)
+		}
+
+		mr := repositories.CreateMonitorRepository(&d)
+
+		mr.GetAll()
 	},
 }
 
